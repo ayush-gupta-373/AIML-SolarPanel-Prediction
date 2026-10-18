@@ -1,27 +1,9 @@
 import {
   ArrowUpRight,
-  Bell,
-  ChevronDown,
-  Leaf,
-  Search,
   Sun,
-  IndianRupee,
-  Zap,
 } from "lucide-react";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { Bar } from "react-chartjs-2";
-import MetricCard from "../common/MetricCard";
 import SectionTitle from "../common/SectionTitle";
-import { brands, chartData, chartOptions, metricTiles, schemes, solarImage, summaryStats } from "../../data/solarData";
-
-ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
+import { brands, metricTiles, schemes, solarImage, summaryStats } from "../../data/solarData";
 
 function DashboardPage({ setActivePage }) {
   return (
@@ -38,29 +20,6 @@ function DashboardPage({ setActivePage }) {
           </p>
         </div>
 
-        <div className="ml-auto flex shrink-0 items-center gap-3">
-          <label className="relative hidden lg:block">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#83919C]" />
-            <input
-              placeholder="Search solar insights..."
-              className="h-9 w-44 rounded-lg border border-[#E3EAF0] bg-[#FAFCFD] pl-9 pr-3 text-[11px] outline-none focus:border-[#0B9A6A] xl:w-56"
-            />
-          </label>
-          <button aria-label="Notifications" className="relative rounded-lg p-2 text-[#536773] hover:bg-[#F1F6F4]">
-            <Bell size={18} />
-            <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-red-500" />
-          </button>
-          <div className="flex items-center gap-2 border-l border-[#E7EDF2] pl-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#087C58] text-xs font-bold text-white">
-              U
-            </div>
-            <div className="hidden sm:block">
-              <p className="text-[10px] font-semibold text-[#172B3A]">Solar User</p>
-              <p className="text-[9px] text-[#83919C]">Home dashboard</p>
-            </div>
-            <ChevronDown size={13} className="hidden text-[#83919C] sm:block" />
-          </div>
-        </div>
       </header>
 
       <section className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-[minmax(0,1.85fr)_repeat(4,minmax(0,0.48fr))]">
@@ -105,69 +64,7 @@ function DashboardPage({ setActivePage }) {
         ))}
       </section>
 
-      <section className="mb-4 grid items-stretch gap-3 xl:grid-cols-[1.18fr_1.2fr_0.65fr]">
-        <div className="rounded-xl border border-[#E5EBF0] bg-white p-3 sm:p-4">
-          <SectionTitle title="Your Solar Potential" subtitle="Illustrative values for the dashboard preview" />
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            <MetricCard
-              title="Recommended Capacity"
-              value="5 kW"
-              note="Example system size"
-              icon={Zap}
-              iconColor="text-[#07885D]"
-              iconBg="bg-[#E4F5EB]"
-            />
-            <MetricCard
-              title="Monthly Generation"
-              value="650 kWh"
-              note="Illustrative estimate"
-              icon={Sun}
-              iconColor="text-[#D6A01C]"
-              iconBg="bg-[#FFF4D9]"
-            />
-            <MetricCard
-              title="Estimated Monthly Savings"
-              value="₹4,550"
-              note="Example calculation only"
-              icon={IndianRupee}
-              iconColor="text-[#7164C2]"
-              iconBg="bg-[#EFECFF]"
-            />
-            <MetricCard
-              title="CO₂ Reduction"
-              value="Estimate"
-              note="Requires verified assumptions"
-              icon={Leaf}
-              iconColor="text-[#17845D]"
-              iconBg="bg-[#E2F5EA]"
-            />
-          </div>
-        </div>
-
-        <div className="min-w-0 rounded-xl border border-[#E5EBF0] bg-white p-3 sm:p-4">
-          <div className="mb-2 flex items-start justify-between gap-2">
-            <div>
-              <h2 className="text-[13px] font-bold text-[#172B3A]">Monthly Solar Generation</h2>
-              <p className="mt-1 text-[10px] text-[#718096]">Example 5 kW system</p>
-            </div>
-            <select
-              aria-label="Solar capacity"
-              className="select select-bordered select-xs w-[75px] rounded-md border-[#E4EBF0] bg-white text-[10px]"
-              defaultValue="5 kW"
-            >
-              <option>1 kW</option>
-              <option>2 kW</option>
-              <option>3 kW</option>
-              <option>5 kW</option>
-              <option>10 kW</option>
-            </select>
-          </div>
-          <div className="h-[205px]">
-            <Bar data={chartData} options={chartOptions} />
-          </div>
-          <p className="mt-2 text-[9px] text-[#8A98A4]">Sample chart only; PVGIS integration comes next.</p>
-        </div>
-
+      <section className="mb-4">
         <div className="rounded-xl border border-[#E5EBF0] bg-white p-3 sm:p-4">
           <SectionTitle title="Quick Summary" />
           <div className="space-y-4">

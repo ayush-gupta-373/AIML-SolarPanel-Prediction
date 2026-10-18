@@ -4,7 +4,6 @@ import {
   PanelsTopLeft,
   ScanSearch,
   Landmark,
-  ChartNoAxesCombined,
   UserRound,
   Sun,
   Zap,
@@ -28,7 +27,6 @@ export const navItems = [
   { label: "Panel Type Comparison", icon: Sun },
   { label: "Fault Detection", icon: ScanSearch },
   { label: "Government Schemes", icon: Landmark },
-  { label: "Solar Insights", icon: ChartNoAxesCombined },
 ];
 
 export const chartData = {

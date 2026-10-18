@@ -23,3 +23,4 @@ BackendFastApi/data/fault_dataset/
 BackendFastApi/ml/fault_detection/runs/
 BackendFastApi/ml/fault_detection/__pycache__/
 BackendFastApi/yolov8n.pt
+/runs/

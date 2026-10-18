@@ -1,4 +1,4 @@
-import { Sun, UserRound, UserPlus, LogIn, X } from "lucide-react";
+import { Sun, X } from "lucide-react";
 import { navItems } from "../../data/solarData";
 
 function Sidebar({ activePage, setActivePage, mobileOpen, setMobileOpen }) {
@@ -54,43 +54,6 @@ function Sidebar({ activePage, setActivePage, mobileOpen, setMobileOpen }) {
           ))}
         </nav>
 
-        <div className="mt-auto space-y-1 pt-2">
-          <button
-            onClick={() => {
-              setActivePage("Profile");
-              setMobileOpen(false);
-            }}
-            className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-[11px] ${
-              activePage === "Profile" ? "bg-[#07865C]" : "text-[#D4E0E4] hover:bg-white/[0.07]"
-            }`}
-          >
-            <UserRound size={17} /> Profile
-          </button>
-
-          <button
-            onClick={() => {
-              setActivePage("Login");
-              setMobileOpen(false);
-            }}
-            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-[11px] ${
-              activePage === "Login" ? "bg-[#07865C] text-white" : "text-[#D4E0E4] hover:bg-white/[0.07]"
-            }`}
-          >
-            <LogIn size={17} /> Login
-          </button>
-
-          <button
-            onClick={() => {
-              setActivePage("Signup");
-              setMobileOpen(false);
-            }}
-            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-[11px] ${
-              activePage === "Signup" ? "bg-[#07865C] text-white" : "text-[#D4E0E4] hover:bg-white/[0.07]"
-            }`}
-          >
-            <UserPlus size={17} /> Sign up
-          </button>
-        </div>
       </aside>
     </>
   );

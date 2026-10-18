@@ -27,7 +27,7 @@ function App() {
       case "Panel Type Comparison":
         return <TypeComparisonPage />;
       case "Fault Detection":
-        return <FaultPage />;
+        return null;
       case "Government Schemes":
         return <SchemesPage />;
       case "Login":
@@ -55,11 +55,9 @@ function App() {
           </div>
 
           {renderPage()}
-
-          <footer className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-[#E3EAF0] py-4 text-[10px] text-[#83919C]">
-            <span>© 2026 SolarAI · Smart Solar Solutions</span>
-            <span>Dashboard preview · Data integration pending</span>
-          </footer>
+          <div className={activePage === "Fault Detection" ? "block" : "hidden"}>
+            <FaultPage />
+          </div>
         </div>
       </main>
     </div>

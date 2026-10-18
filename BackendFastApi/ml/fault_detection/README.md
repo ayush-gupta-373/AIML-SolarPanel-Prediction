@@ -60,3 +60,13 @@ The source labels include both `Good` and `Saglam`; verify that those labels
 have distinct meanings before interpreting those predictions as separate
 conditions. The test split is small, so independently evaluate on new photos
 from the intended phones and deployment conditions before relying on results.
+
+The interface treats `BakimGereken` predictions below 60% confidence as
+low-confidence review suggestions rather than confirmed findings; other classes
+use the 25% screening threshold. These scores are not calibrated probabilities.
+The dataset has a `Dirty` surface-soiling label, but no dedicated bird-dropping
+class, so the model cannot reliably distinguish bird droppings from other dirt.
+In this downloaded split, the test labels contain no `Dirty` examples; test
+metrics therefore do not validate dirty-panel recognition. Add representative,
+correctly boxed dirt and bird-dropping photos to a labeled dataset and evaluate
+on a separate test set before relying on that behavior.

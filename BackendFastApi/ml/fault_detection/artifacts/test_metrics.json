@@ -1,0 +1,17 @@
+{
+  "model": "YOLOv8n",
+  "dataset": "C:\\SolarAI\\BackendFastApi\\data\\fault_dataset\\data.yaml",
+  "classes": [
+    "BakimGereken",
+    "Cracked",
+    "Dirty",
+    "Good",
+    "Saglam"
+  ],
+  "test_metrics": {
+    "map50": 0.9746086956521739,
+    "map50_95": 0.6752002581280958,
+    "precision": 0.9515945456901637,
+    "recall": 0.9398291910564377
+  }
+}

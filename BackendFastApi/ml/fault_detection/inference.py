@@ -11,6 +11,9 @@ FAULT_MODEL_FILE = FAULT_MODEL_DIR / "fault_detector.onnx"
 CLASS_NAMES_FILE = FAULT_MODEL_DIR / "class_names.json"
 MODEL_IMAGE_SIZE = 640
 MAX_DETECTIONS = 50
+CLASS_CONFIDENCE_THRESHOLDS = {
+    "BakimGereken": 0.60,
+}
 
 
 @lru_cache(maxsize=1)
@@ -76,29 +79,43 @@ def predict_faults(image: Image.Image, confidence_threshold: float = 0.25) -> di
         raise ValueError("Fault detection model returned an unsupported output shape.")
 
     detections = []
+    review_candidates = []
     for prediction in predictions:
         x1, y1, x2, y2, confidence, class_id = prediction[:6]
-        if confidence < confidence_threshold:
-            continue
         class_index = int(class_id)
         if class_index < 0 or class_index >= len(class_names):
+            continue
+        class_name = class_names[class_index]
+        class_threshold = max(
+            confidence_threshold,
+            CLASS_CONFIDENCE_THRESHOLDS.get(class_name, confidence_threshold),
+        )
+        if confidence < confidence_threshold:
             continue
 
         x1 = float(np.clip((x1 - pad_x) / scale, 0, image_width))
         y1 = float(np.clip((y1 - pad_y) / scale, 0, image_height))
         x2 = float(np.clip((x2 - pad_x) / scale, 0, image_width))
         y2 = float(np.clip((y2 - pad_y) / scale, 0, image_height))
-        detections.append({
+        detection = {
             "class_id": class_index,
-            "class_name": class_names[class_index],
+            "class_name": class_name,
             "confidence": round(float(confidence), 4),
+            "confidence_threshold": class_threshold,
             "bbox_xyxy": [
                 round(x1, 1),
                 round(y1, 1),
                 round(x2, 1),
                 round(y2, 1),
             ],
-        })
+        }
+        if confidence < class_threshold:
+            review_candidates.append(detection)
+            if len(review_candidates) >= MAX_DETECTIONS:
+                break
+            continue
+
+        detections.append(detection)
         if len(detections) >= MAX_DETECTIONS:
             break
 
@@ -107,4 +124,5 @@ def predict_faults(image: Image.Image, confidence_threshold: float = 0.25) -> di
         "image_height": image_height,
         "confidence_threshold": confidence_threshold,
         "detections": detections,
+        "review_candidates": review_candidates,
     }

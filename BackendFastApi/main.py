@@ -308,10 +308,14 @@ def analyze_fault_image(image_file: UploadFile = File(...)):
 
     result["filename"] = Path(image_file.filename or "panel-image").name
     result["message"] = (
-        "No condition was detected above the confidence threshold. "
-        "This does not confirm that the panel is fault-free."
-        if not result["detections"]
-        else "Visual screening result only; this model cannot diagnose internal electrical faults."
+        "Possible visual conditions were detected. Treat these as screening suggestions, "
+        "not a confirmed diagnosis."
+        if result["detections"]
+        else "The model found a low-confidence region to review. It could be a false alarm "
+        "or a real issue; check the marked area yourself."
+        if result["review_candidates"]
+        else "No supported visual condition was confidently detected. This does not confirm "
+        "that the panel is clean or fault-free."
     )
     return result
 
