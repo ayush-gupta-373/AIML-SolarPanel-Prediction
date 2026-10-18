@@ -1,3 +1,5 @@
+import io
+import os
 from functools import lru_cache
 from pathlib import Path
 from typing import Annotated
@@ -5,14 +7,19 @@ from typing import Annotated
 import joblib
 import numpy as np
 import pandas as pd
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from PIL import Image, ImageOps, UnidentifiedImageError
 from pydantic import BaseModel, Field, model_validator
+
+from ml.fault_detection.inference import predict_faults
 
 BASE_DIR = Path(__file__).resolve().parent
 CITY_FILE = BASE_DIR / "data" / "raw" / "india_city_coordinates.csv"
 TRAINING_FILE = BASE_DIR / "data" / "processed" / "india_solar_training.csv"
 MODEL_FILE = BASE_DIR / "ml" / "artifacts" / "monthly_generation.joblib"
+MAX_FAULT_IMAGE_BYTES = 10 * 1024 * 1024
+MAX_FAULT_IMAGE_PIXELS = 40_000_000
 MONTH_NAMES = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December",
@@ -23,14 +30,17 @@ FINANCIAL_YEAR_START_MONTH = 4
 CREDIT_SETTLEMENT_RATE_INR_PER_KWH = 2.0
 
 app = FastAPI(title="SolarAI")
+allowed_origins = [
+    origin.strip()
+    for origin in os.getenv(
+        "FRONTEND_ORIGINS",
+        "http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174",
+    ).split(",")
+    if origin.strip()
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:5174",
-        "http://127.0.0.1:5174",
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -251,6 +261,59 @@ def home():
 @app.get("/health")
 def health():
     return {"status": "healthy"}
+
+
+@app.post("/api/fault-detection/analyze")
+def analyze_fault_image(image_file: UploadFile = File(...)):
+    if image_file.content_type not in {"image/jpeg", "image/png", "image/webp"}:
+        raise HTTPException(
+            status_code=415,
+            detail="Upload a JPEG, PNG, or WebP panel photo.",
+        )
+
+    image_bytes = image_file.file.read(MAX_FAULT_IMAGE_BYTES + 1)
+    if len(image_bytes) > MAX_FAULT_IMAGE_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail="Image must be 10 MB or smaller.",
+        )
+    if not image_bytes:
+        raise HTTPException(status_code=400, detail="The uploaded image is empty.")
+
+    try:
+        with Image.open(io.BytesIO(image_bytes)) as decoded_image:
+            if decoded_image.width * decoded_image.height > MAX_FAULT_IMAGE_PIXELS:
+                raise HTTPException(
+                    status_code=413,
+                    detail="Image dimensions must not exceed 40 megapixels.",
+                )
+            decoded_image.verify()
+        with Image.open(io.BytesIO(image_bytes)) as opened_image:
+            panel_image = ImageOps.exif_transpose(opened_image).convert("RGB")
+    except (UnidentifiedImageError, OSError, Image.DecompressionBombError) as image_error:
+        raise HTTPException(
+            status_code=400,
+            detail="The uploaded file is not a readable image.",
+        ) from image_error
+
+    try:
+        result = predict_faults(panel_image)
+    except FileNotFoundError as model_error:
+        raise HTTPException(status_code=503, detail=str(model_error)) from model_error
+    except ValueError as model_error:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Fault detector returned an invalid result: {model_error}",
+        ) from model_error
+
+    result["filename"] = Path(image_file.filename or "panel-image").name
+    result["message"] = (
+        "No condition was detected above the confidence threshold. "
+        "This does not confirm that the panel is fault-free."
+        if not result["detections"]
+        else "Visual screening result only; this model cannot diagnose internal electrical faults."
+    )
+    return result
 
 
 @app.get("/api/solar/locations")

@@ -19,3 +19,7 @@ pytest_cache/
 .mypy_cache/
 .ruff_cache/
 .tox/
+BackendFastApi/data/fault_dataset/
+BackendFastApi/ml/fault_detection/runs/
+BackendFastApi/ml/fault_detection/__pycache__/
+BackendFastApi/yolov8n.pt

@@ -1,0 +1,2 @@
+-r ../../Requirements.txt
+ultralytics>=8.3,<9
